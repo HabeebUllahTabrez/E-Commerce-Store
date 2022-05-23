@@ -14,6 +14,7 @@ app.set("views", "views");
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.get404);
 
@@ -37,7 +39,7 @@ mongoose
         "mongodb+srv://habeeb:cYSfWwEZDghb24CQ@cluster0.zmqhg.mongodb.net/shop?retryWrites=true&w=majority"
     )
     .then((result) => {
-        return User.findOne()
+        return User.findOne();
     })
     .then((user) => {
         if (!user) {
@@ -52,7 +54,7 @@ mongoose
         }
         return user;
     })
-    .then(user => {
+    .then((user) => {
         app.listen(3000);
         console.log("The server is up and running at http://localhost:3000");
     })
