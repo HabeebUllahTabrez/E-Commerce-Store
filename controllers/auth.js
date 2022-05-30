@@ -2,6 +2,7 @@ const crypto = require("crypto");
 
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
+const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 
@@ -46,6 +47,16 @@ exports.postLogin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // console.log(errors.array());
+        return res.status(422).render("auth/login", {
+            path: "/login",
+            pageTitle: "Login",
+            errorMessage: errors.array()[0].msg,
+        });
+    }
+
     User.findOne({ email: email })
         .then((user) => {
             if (!user) {
@@ -71,30 +82,25 @@ exports.postSignup = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // console.log(errors.array());
+        return res.status(422).render("auth/signup", {
+            path: "/signup",
+            pageTitle: "Signup",
+            errorMessage: errors.array()[0].msg,
+        });
+    }
 
-    User.findOne({
-        email: email,
-    })
-        .then((userDoc) => {
-            // If the user with that email already exists
-            if (userDoc) {
-                req.flash(
-                    "error",
-                    "User with the entered email already exists."
-                );
-                return res.redirect("/signup");
-            }
-            // If the user doesnt exist (NEW USER)
+    // If the user doesnt exist (NEW USER)
+    const hashedPassword = bcrypt.hashSync(password, 12);
+    const user = new User({
+        email,
+        password: hashedPassword,
+        cart: { items: [] },
+    });
 
-            const hashedPassword = bcrypt.hashSync(password, 12);
-            const user = new User({
-                email,
-                password: hashedPassword,
-                cart: { items: [] },
-            });
-
-            return user.save();
-        })
+    user.save()
         .then((user) => {
             res.redirect("/login");
             return transport.sendMail({
