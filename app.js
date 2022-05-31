@@ -70,8 +70,8 @@ mongoose
     .then((result) => {
         app.listen(process.env.PORT || 3000);
         console.log(
-            "The server is up and running at http://localhost:",
-            process.env.PORT || 3000
+            "The server is up and running at http://localhost:" +
+                process.env.PORT || 3000
         );
     })
     .catch((err) => console.log(err));
