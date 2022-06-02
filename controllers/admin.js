@@ -26,7 +26,7 @@ exports.postAddProduct = (req, res, next) => {
 
         return res.status(422).render("admin/edit-product", {
             pageTitle: "Add Product",
-            path: "/admin/edit-product",
+            path: "/admin/add-product",
             editing: false,
             hasError: true,
             product: { title, imageUrl, price, description },
@@ -48,7 +48,11 @@ exports.postAddProduct = (req, res, next) => {
             console.log("Product has been added");
             res.redirect("/admin/products");
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+            const error = new Error(er);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -71,7 +75,11 @@ exports.getEditProduct = (req, res, next) => {
                 errorMessage: null,
             });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+            const error = new Error(er);
+            error.httpStatusCode = 500;
+            return next(error); 
+        });
 };
 
 exports.postEditProduct = (req, res, next) => {
