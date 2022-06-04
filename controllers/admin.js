@@ -14,10 +14,23 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
     const title = req.body.title;
-    const imageUrl = req.body.imageUrl;
+    const image = req.file;
     const price = req.body.price;
     const description = req.body.description;
     const userId = req.user;
+
+    console.log(req.file);
+
+    if (!image) {
+        return res.status(422).render("admin/edit-product", {
+            pageTitle: "Add Product",
+            path: "/admin/add-product",
+            editing: false,
+            hasError: true,
+            product: { title, price, description },
+            errorMessage: "Attached file is not an image.",
+        });
+    }
 
     const errors = validationResult(req);
 
@@ -33,6 +46,8 @@ exports.postAddProduct = (req, res, next) => {
             errorMessage: errors.array()[0].msg,
         });
     }
+
+    const imageUrl = image.path;
 
     const product = new Product({
         title,
@@ -85,7 +100,7 @@ exports.getEditProduct = (req, res, next) => {
 exports.postEditProduct = (req, res, next) => {
     const prodId = req.body.id;
     const updatedTitle = req.body.title;
-    const updatedImageUrl = req.body.imageUrl;
+    const image = req.file;
     const updatedPrice = req.body.price;
     const updatedDescription = req.body.description;
 
@@ -101,7 +116,6 @@ exports.postEditProduct = (req, res, next) => {
             hasError: true,
             product: {
                 title: updatedTitle,
-                imageUrl: updatedImageUrl,
                 price: updatedPrice,
                 description: updatedDescription,
                 _id: prodId,
@@ -115,10 +129,15 @@ exports.postEditProduct = (req, res, next) => {
             if (product.userId.toString() !== req.user._id.toString()) {
                 return res.redirect("/");
             }
+
+            if (image) {
+                product.imageUrl = image.path;
+            }
+
             product.title = updatedTitle;
-            product.imageUrl = updatedImageUrl;
             product.price = updatedPrice;
             product.description = updatedDescription;
+
             return product
                 .save()
                 .then((result) => {

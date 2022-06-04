@@ -19,7 +19,6 @@ router.post(
             .isString()
             .withMessage("Please enter a valid Title")
             .trim(),
-        body("imageUrl").isURL().withMessage("Please enter a valid Image Url"),
         body("price").isFloat().withMessage("Please enter a valid Price"),
         body("description").trim(),
     ],
@@ -36,7 +35,6 @@ router.post(
             .isString()
             .withMessage("Please enter a valid Title")
             .trim(),
-        body("imageUrl").isURL().withMessage("Please enter a valid Image Url"),
         body("price").isFloat().withMessage("Please enter a valid Price"),
         body("description").trim(),
     ],
